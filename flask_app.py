@@ -27,6 +27,10 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import math
 
+from bokeh.embed import components
+from bokeh.plotting import figure
+from bokeh.resources import INLINE
+# from bokeh.util.string import encode_utf8
 
 app = Flask(__name__, static_folder='static')
 qrcode = QRcode(app)
@@ -312,8 +316,58 @@ def code_timsort():
     url_file_image_simpan = os.path.join(BASE_DIR, url_simpan)
     plt.savefig(url_file_image_simpan)
 
+    # Cara ke-3
+    # /bokeh
+
+
     # return hasil
     return render_template_string(A_a+template_view+Z_z, data_sblm_stlh = zip(data_sblm_sort, data_stlh_sort), hasil = hasil, image_timer = pngImageB64String, url_image = url_simpan)
+
+@app.route('/bokeh')
+def bokeh():
+    # init a basic bar chart:
+    # http://bokeh.pydata.org/en/latest/docs/user_guide/plotting.html#bars
+    fig = figure(plot_width=300, plot_height=300)
+    fig.vbar(
+        x=[1, 2, 3, 4],
+        width=0.5,
+        bottom=0,
+        top=[1.7, 2.2, 4.6, 3.9],
+        color='navy'
+    )
+
+    # grab the static resources
+    js_resources = INLINE.render_js()
+    css_resources = INLINE.render_css()
+
+    template_view ='''
+    <!-- <!doctype html> -->
+    <!-- <html lang="en"> -->
+    <!--  <head> -->
+        <meta charset="utf-8">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <title>Embed Demo</title>
+        {{ js_resources|indent(4)|safe }}
+        {{ css_resources|indent(4)|safe }}
+        {{ plot_script|indent(4)|safe }}
+    <!--  </head> -->
+    <!--  <body> -->
+        {{ plot_div|indent(4)|safe }}
+    <!--  </body> -->
+    <!-- </html> -->
+    '''
+
+    # render template
+    script, div = components(fig)
+    html = render_template_string(
+        A_a+template_view+Z_z,
+        plot_script=script,
+        plot_div=div,
+        js_resources=js_resources,
+        css_resources=css_resources,
+    )
+
+    return html
 
 @app.route('/db/<aksi>')
 def manipulate_tabel(aksi):
