@@ -16,6 +16,18 @@ from flask_qrcode import QRcode
 from io import BytesIO
 import os
 
+import io
+import base64
+
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import math
+
+
 app = Flask(__name__, static_folder='static')
 qrcode = QRcode(app)
 
@@ -87,9 +99,8 @@ Z_z = FrameWeb_bawah
 
 # from re import M
 
-def listToString(a):
-  string1 = " "
-  return (string1.join(a))
+def listToString(aList):
+  return ''.join(str(aList))
 
 import random
 import numpy as np
@@ -168,13 +179,16 @@ def timSort(arr):
 
     return arr
 
-@app.route('/code_timsort')
+@app.route('/code_timsort', methods=['GET'])
 def code_timsort():
     # a = 12
     # b = 7
     # return str(a+b)
 
     import time
+    import os.path
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
     template_view = '''
             <!--- <html> --->
@@ -187,18 +201,28 @@ def code_timsort():
                 </p>
             </h2>
                   <form method="post">
+                   {%for data_get in data_sblm_stlh %}
+                    Input Size (N) = {{ loop.index }}
+                    <br>
                     Data Sebelum di-Sorting: <br>
-                    {{ sblm_sort }}
+                    {{ data_get[0] }}
                     <br>
                     Data Setelah di-Sorting: <br>
-                    {{ stlh_sort }}
-                    <br>
+                    {{ data_get[1] }}
+                    <br><br>
+                   {%endfor%}
                   </form>
                   <h2>Hasil:  </h2>
                   {% for data_hasil in hasil  %}
                     {{ data_hasil }}
                     <br>
                   {% endfor %}
+
+                  <h2>Plot Waktu by Timer:  </h2>
+                  <img src={{url_image}} alt="Chart" height="480" width="640">
+                  <br>
+                  <img src={{image_timer}} alt="Chart" height="480" width="640">
+
             <!--- </body> --->
             <!--- </html> --->
         '''
@@ -206,10 +230,13 @@ def code_timsort():
 
     input_size = 10
     array_waktu_dalam_detik = np.zeros([input_size,2])
+    data_sblm_sort = []
+    data_stlh_sort = []
     for i in range(input_size):
-        stringToFloat = random.sample(range(0, 1000), (i+1))
+        randomData = random.sample(range(0, 1000), (i+1))
+        data_sblm_sort.append(listToString(randomData))
         start_time = time.time()
-        listData = stringToFloat
+        listData = randomData
 
         # print(f'Data sebelum sorted : {stringToFloat}')
         timSort(listData) # bisa diganti dengan fibo/ unique element
@@ -219,6 +246,10 @@ def code_timsort():
 
         end_time = time.time()
         elapsed_time = end_time - start_time
+
+        data_stlh_sort.append(listToString(listData))
+
+
         # print('Waktu dengan Timer (detik): ', elapsed_time, ' vs Waktu dengan T(n) = ',(i+1), 'Log (',(i+1),'): ', (i+1)*np.log2(i+1))
         np.set_printoptions(suppress=True)
         array_waktu_dalam_detik[i][0] = round((i+1),0)
@@ -229,9 +260,60 @@ def code_timsort():
         for idx, time_val in enumerate(list(array_waktu_dalam_detik[:,1])):
             hasil.append('Input Size (N) = ' + str(idx+1) + ', dgn waktu  ' +str('{0:.10f}'.format(time_val)) + ' (detik)')
 
-    # return hasil
-    return render_template_string(A_a+template_view+Z_z, sblm_sort = stringToFloat, stlh_sort = listData, hasil = hasil)
+    # plot hasil waktunya
+    n=list(range(1,input_size+1))
 
+    # Cara ke-1
+    # Generate plot
+    fig = Figure()
+    axis = fig.add_subplot(1, 1, 1)
+    axis.set_title("Plot Waktu by Timer Alg. Timsort")
+    axis.set_xlabel("Banyak Data (N)")
+    axis.set_ylabel("Waktu Komputasi")
+    axis.grid()
+    axis.plot(n, [x*math.log(x,2) for x in n], 'r.-', label='TimSort by T(n)')
+    axis.plot(n,list(array_waktu_dalam_detik[:,1][:len(n)]), 'go-', label='TimSort by Timer')
+    # axis.plot(range(5), range(5), "ro-")
+
+    # legend = axis.legend(loc='upper center', shadow=True, fontsize='x-large')
+
+    # # Put a nicer background color on the legend.
+    # legend.get_frame().set_facecolor('C0')
+
+    axis.legend(loc="upper left")
+
+    # Convert plot to PNG image
+    pngImage = io.BytesIO()
+    FigureCanvas(fig).print_png(pngImage)
+
+    # Encode PNG image to base64 string
+    pngImageB64String = "data:image/png;base64,"
+    pngImageB64String += base64.b64encode(pngImage.getvalue()).decode('utf8')
+
+    # Cara ke-2
+    # simpan dalam path + nama file /static/img/new_timer.png
+    url_simpan = "static/img/new_timer.png"
+
+    fig = plt.figure()
+    # plt.plot(n, [math.log(x,2) for x in n], 'g.-', label='logN') # logN
+    # plt.plot(n, n, 'b.-', label='N') # N
+    plt.plot(n, [x*math.log(x,2) for x in n], 'r.-', label='TimSort by T(n)') # NlogN
+    # plt.plot(n, [x*x for x in n], 'r.-') # N^2
+    # plt.plot(n, [x*x*x for x in n], 'r.-') # N^3
+    # plt.plot(n, [math.pow(2,x) for x in n], 'r.-') # 2^N
+    # plt.plot(n, [math.factorial(x) for x in n], 'r.-') # N!
+    plt.plot(n,list(array_waktu_dalam_detik[:,1][:len(n)]), 'g.-', label='TimSort by Timer') # TimSort
+
+    plt.xlabel('Banyak Data (N)')
+    plt.ylabel('Waktu Komputasi')
+    plt.legend(loc="upper left")
+    plt.show()
+
+    url_file_image_simpan = os.path.join(BASE_DIR, url_simpan)
+    plt.savefig(url_file_image_simpan)
+
+    # return hasil
+    return render_template_string(A_a+template_view+Z_z, data_sblm_stlh = zip(data_sblm_sort, data_stlh_sort), hasil = hasil, image_timer = pngImageB64String, url_image = url_simpan)
 
 @app.route('/db/<aksi>')
 def manipulate_tabel(aksi):
