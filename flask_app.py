@@ -85,7 +85,7 @@ Z_z = FrameWeb_bawah
 # def hello_daa():
 #    return 'Hello Students | Koding Desain dan Analisis Algoritma (DAA) pada Teknologi Cloud :D'
 
-from re import M
+# from re import M
 
 def listToString(a):
   string1 = " "
@@ -168,623 +168,70 @@ def timSort(arr):
 
     return arr
 
-@app.route('/timer')
-def timer():
+@app.route('/code_timsort')
+def code_timsort():
     # a = 12
     # b = 7
     # return str(a+b)
 
     import time
 
+    template_view = '''
+            <!--- <html> --->
+            <!--- <head> --->
+            <!--- </head> --->
+            <!--- <body> --->
+            <h2>
+                <p style="text-decoration: underline;">
+                  Log Analisis Algoritma Timsort dgn Timer:
+                </p>
+            </h2>
+                  <form method="post">
+                    Data Sebelum di-Sorting: <br>
+                    {{ sblm_sort }}
+                    <br>
+                    Data Setelah di-Sorting: <br>
+                    {{ stlh_sort }}
+                    <br>
+                  </form>
+                  <h2>Hasil:  </h2>
+                  {% for data_hasil in hasil  %}
+                    {{ data_hasil }}
+                    <br>
+                  {% endfor %}
+            <!--- </body> --->
+            <!--- </html> --->
+        '''
+
 
     input_size = 10
     array_waktu_dalam_detik = np.zeros([input_size,2])
     for i in range(input_size):
-      stringToFloat = random.sample(range(0, 1000), (i+1))
-      start_time = time.time()
-      listSuhu = stringToFloat
-      # print(f'Data sebelum sorted : {stringToFloat}')
-      timSort(listSuhu) # bisa diganti dengan fibo/ unique element
+        stringToFloat = random.sample(range(0, 1000), (i+1))
+        start_time = time.time()
+        listData = stringToFloat
+
+        # print(f'Data sebelum sorted : {stringToFloat}')
+        timSort(listData) # bisa diganti dengan fibo/ unique element
+        # print(f'Data setelah sorted : {listData}')
+
+        y = (len(listData)) - 1
+
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        # print('Waktu dengan Timer (detik): ', elapsed_time, ' vs Waktu dengan T(n) = ',(i+1), 'Log (',(i+1),'): ', (i+1)*np.log2(i+1))
+        np.set_printoptions(suppress=True)
+        array_waktu_dalam_detik[i][0] = round((i+1),0)
+        array_waktu_dalam_detik[i][1] = round(elapsed_time,6)
+        #print()
+
+        hasil = []
+        for idx, time_val in enumerate(list(array_waktu_dalam_detik[:,1])):
+            hasil.append('Input Size (N) = ' + str(idx+1) + ', dgn waktu  ' +str('{0:.10f}'.format(time_val)) + ' (detik)')
+
+    # return hasil
+    return render_template_string(A_a+template_view+Z_z, sblm_sort = stringToFloat, stlh_sort = listData, hasil = hasil)
 
-      # print(f'Data setelah sorted : {listSuhu}')
-      y = (len(listSuhu)) - 1
-
-      end_time = time.time()
-      elapsed_time = end_time - start_time
-      # print('Waktu dengan Timer (detik): ', elapsed_time, ' vs Waktu dengan T(n) = ',(i+1), 'Log (',(i+1),'): ', (i+1)*np.log2(i+1))
-      np.set_printoptions(suppress=True)
-      array_waktu_dalam_detik[i][0] = round((i+1),0)
-      array_waktu_dalam_detik[i][1] = round(elapsed_time,6)
-      #print()
-
-      hasil = ''
-      for time in list(array_waktu_dalam_detik[:,1]):
-          hasil += str(time) + '<br>'
-
-
-      return hasil
-      
-      
-
-# Start =============================
-# 2.1 Pengantar Sistem Bilangan
-# ===================================
-@app.route('/code_2_1/<dec>')
-def code_2_1(dec):
-
-    # konversi "deca atau basis 10" ke "biner atau basis 2"
-    # 19 (deca) => 10011 (biner)
-    # dengan fungsi lambda
-    binary = lambda n: '' if n==0 else binary(n//2) + str(n%2)
-    hasil = str(binary(int(dec)))
-    hasil = '0' if hasil == '' else hasil
-
-    return hasil
-
-#
-# buatlah halaman post sekaligus get | Tipe 2
-# untuk hitung hasil Dec2Bin
-@app.route('/dec2bin_2', methods=["POST", "GET"])
-def dec2bin_2():
-
-    template_view_1 = '''
-            <!--- <html> --->
-            <!--- <head> --->
-            <!--- </head> --->
-            <!--- <body> --->
-                  <form method="post">
-                    Masukkan nilai (basis 10) = <input type="text" name="a" value="{{a_post}}" />
-                    <input type="submit" value="Hitung Konversi basis 10 ke 2"/>
-                  </form>
-                  <h2>Hasil Dec2Bin = {{ hasil }} </h2>
-            <!--- </body> --->
-            <!--- </html> --->
-        '''
-
-    template_view_2 = '''
-            <!--- <html> --->
-            <!--- <head> --->
-            <!--- </head> --->
-            <!--- <body> --->
-                  <form action="/dec2bin_2" method="post">
-                    Masukkan nilai (basis 10) = <input type="text" name="a" value="" />
-                    <input type="submit" value="Hitung Konversi basis 10 ke 2"/>
-                  </form>
-            <!--- </body> --->
-            <!--- </html> --->
-        '''
-
-    if request.method == 'POST': # dioperasikan dihalaman sendiri tanpa send ke route, misal /dec2bin_2
-
-        dec = int(float(request.form['a']))
-
-        # hitung hasil dec2Bin atau basis 10 ke basis 2
-        # cara ke-1
-        binary = lambda n: '' if n==0 else binary(n//2) + str(n%2)
-
-        # cara ke-2
-        def decToBin(n):
-            if n==0:
-                return ''
-            else:
-                return decToBin(n//2) + str(n%2)
-
-        hasil = str(decToBin(int(dec)))
-        hasil = '0' if hasil == '' else hasil
-
-        return render_template_string(A_a+template_view_1+Z_z, a_post = dec, hasil = hasil)
-
-    else: # untuk yang 'GET' data awal untuk di send ke /dec2bin_2
-        return render_template_string(A_a+template_view_2+Z_z)
-
-@app.route('/2_1_0/<dec>')
-def code_2_1_0(dec):
-    # konversi "deca atau basis 10" ke "biner atau basis 2"
-    # dengan fungsi yang dibuat mandiri, misal dengan nama decToBin
-    def decToBin(n):
-        if n==0: return ''
-        else:
-            return decToBin(n//2) + str(n%2)
-
-    hasil = str(decToBin(int(dec)))
-    hasil = '0' if hasil == '' else hasil
-
-    return hasil
-
-@app.route('/code_2_1_1')
-def code_2_1_1():
-    # konversi "deca atau basis 10" ke "biner atau basis 2"
-    # dengan library numpy
-    import numpy as np
-
-    a = 10
-    b = 4
-
-    # <br> adalah new line
-
-    return "a = " + str(a) + " (Basis 10) = " + str(np.binary_repr(a, width=8)) + " (Basis 2) <br>" + \
-    "b = " + str(b) + " (Basis 10) = " + str(np.binary_repr(b, width=8)) + " (Basis 2)"
-
-@app.route('/code_2_1_2')
-def code_2_1_2():
-    # mencoba konversi bilangan "Decimal ( base r=10 ) atau basis 10" |
-    # "Binary ( base r=2) atau basis 2" |
-    # "Octal ( base r=8 ) atau basis 8" |
-    # "Hexadecimal ( base r=16 ) atau basis 16"
-
-    # contoh:
-    # ----------------
-    # >>> bin(8)
-    # '0b1000'
-    # >>> oct(8)
-    # '0o10'
-    # >>> hex(8)
-    # '0x8'
-    #
-    # octal_num = 17 # misal sbg bilangan octal
-    # binary_num = bin(int(str(octal_num), 8))  # octal ke binary, hasilnya '0b1111'
-    # dec = int(binary_num, 2)  # binary ke decimal, hasilnya '15'
-
-    # Ref:
-    # [0] https://stackoverflow.com/questions/3973685/python-homework-converting-any-base-to-any-base
-    # [1] https://stackoverflow.com/questions/67300423/python-octal-to-decimal
-    # [2] https://stackoverflow.com/questions/47761528/converting-a-base-10-number-to-any-base-without-strings
-    # [3] https://stackoverflow.com/questions/3528146/convert-decimal-to-binary-in-python
-    #
-    #     Remodified by Imam Cholissodin
-    #
-    def konversiBilangan(n, base=10, to=10):
-        '''
-        params atau argumen:
-          n     - bilangan yang dikonversi
-          base  - basis awal dari bilangan 'n'
-          to    - basis target, must be <= 36 , nilai 36 sbg batasan basis
-        '''
-        # cek basis target untuk memastikan apakah <= 36
-        if to > 36 or base > 36:
-            raise ValueError('max base is 36')
-
-        # melakukan konversi dengan fungsi bawaan (built-in) dari python yaitu "int",
-        # sesuai nilai base sebagai basis yang dimasukkan pada argumen
-        n = int(str(n), base)
-        positive = n >= 0
-
-        # return if base 10 is desired
-        if to == 10:
-            return str(n)
-
-        # melakukan konversi sesuai dengan nilai to sebagai basis yang dimasukkan pada argumen
-        n = abs(n)
-        num = []
-        handle_digit = lambda n: str(n) if n < 10 else chr(n + 55)
-        while n > 0:
-            num.insert(0, handle_digit(n % to))
-            n = n // to
-
-        # return hasil dalam bentuk string
-        return '0' if ''.join(num)=='' else ''.join(num) if positive else '-' + ''.join(num)
-
-
-    import numpy as np
-
-    # generate angka dengan basis 10
-    batas_generate = 18
-    basis_10 = np.arange(0,batas_generate,1)
-
-    # menampung hasil konversi
-    basis_2 = []
-    basis_8 = []
-    basis_16 = []
-    for angka_basis_10 in basis_10:
-        # basis_10 ke basis_2
-        basis_2.append(konversiBilangan(angka_basis_10,10,2))
-
-        # basis_10 ke basis_8
-        basis_8.append(konversiBilangan(angka_basis_10,10,8))
-
-        # basis_10 ke basis_16
-        basis_16.append(konversiBilangan(angka_basis_10,10,16))
-
-    template_view = '''
-              <h2>
-                <!--- <p style="text-decoration: underline;"> --->
-                <!---   Konversi Basis "10" | --->
-                <!---   "2" | --->
-                <!---   "8" | --->
-                <!---   "16": --->
-                <!--- </p> --->
-                <p style="text-decoration: underline;">
-                  Konversi Basis "10" |
-                  "2" |
-                  "8" |
-                  "16":
-                </p>
-              </h2>
-              <table border ="1">
-                    <tr>
-                      <td align = "center">&nbsp; Decimal ( base r=10 ) &nbsp;</td>
-                      <td align = "center">&nbsp; Binary ( base r=2) &nbsp;</td>
-                      <td align = "center">&nbsp; Octal ( base r=8 ) &nbsp;</td>
-                      <td align = "center">&nbsp; Hexadecimal ( base r=16 ) &nbsp;</td>
-                    </tr>
-                    {% for angka_basis_10, angka_basis_2, angka_basis_8, angka_basis_16  in basis_all  %}
-                    <tr>
-                      <td align = "center">{{angka_basis_10}}</td>
-                      <td align = "center">{{angka_basis_2}}</td>
-                      <td align = "center">{{angka_basis_8}}</td>
-                      <td align = "center">{{angka_basis_16}}</td>
-                    </tr>
-                    {% endfor %}
-              </table>
-        '''
-    return render_template_string(A_a+template_view+Z_z, basis_all = zip(basis_10, basis_2, basis_8, basis_16))
-
-@app.route('/code_2_1_2_2', methods=["POST", "GET"])
-def code_2_1_2_2():
-    # mencoba konversi bilangan "Decimal ( base r=10 ) atau basis 10" |
-    # "Binary ( base r=2) atau basis 2" |
-    # "Octal ( base r=8 ) atau basis 8" |
-    # "Hexadecimal ( base r=16 ) atau basis 16"
-
-    # contoh:
-    # ----------------
-    # >>> bin(8)
-    # '0b1000'
-    # >>> oct(8)
-    # '0o10'
-    # >>> hex(8)
-    # '0x8'
-    #
-    # octal_num = 17 # misal sbg bilangan octal
-    # binary_num = bin(int(str(octal_num), 8))  # octal ke binary, hasilnya '0b1111'
-    # dec = int(binary_num, 2)  # binary ke decimal, hasilnya '15'
-
-    # Ref:
-    # [0] https://stackoverflow.com/questions/3973685/python-homework-converting-any-base-to-any-base
-    # [1] https://stackoverflow.com/questions/67300423/python-octal-to-decimal
-    # [2] https://stackoverflow.com/questions/47761528/converting-a-base-10-number-to-any-base-without-strings
-    # [3] https://stackoverflow.com/questions/3528146/convert-decimal-to-binary-in-python
-    #
-    #     Remodified by Imam Cholissodin
-    #
-    def konversiBilangan(n, base=10, to=10):
-        '''
-        params atau argumen:
-          n     - bilangan yang dikonversi
-          base  - basis awal dari bilangan 'n'
-          to    - basis target, must be <= 36 , nilai 36 sbg batasan basis
-        '''
-        # cek basis target untuk memastikan apakah <= 36
-        if to > 36 or base > 36:
-            raise ValueError('max base is 36')
-
-        # melakukan konversi dengan fungsi bawaan (built-in) dari python yaitu "int",
-        # sesuai nilai base sebagai basis yang dimasukkan pada argumen
-        n = int(str(n), base)
-        positive = n >= 0
-
-        # return if base 10 is desired
-        if to == 10:
-            return str(n)
-
-        # melakukan konversi sesuai dengan nilai to sebagai basis yang dimasukkan pada argumen
-        n = abs(n)
-        num = []
-        handle_digit = lambda n: str(n) if n < 10 else chr(n + 55)
-        while n > 0:
-            num.insert(0, handle_digit(n % to))
-            n = n // to
-
-        # return hasil dalam bentuk string
-        return '0' if ''.join(num)=='' else ''.join(num) if positive else '-' + ''.join(num)
-
-
-    import numpy as np
-
-    if request.method == 'POST': # dioperasikan dihalaman sendiri tanpa send ke route, misal /code_2_1_2_2
-        # get nilai batas (a)
-        dec = int(float(request.form['a']))+1
-
-        # generate angka dengan basis 10
-        batas_generate = dec
-        basis_10 = np.arange(0,batas_generate,1)
-
-        # menampung hasil konversi
-        basis_2 = []
-        basis_8 = []
-        basis_16 = []
-        for angka_basis_10 in basis_10:
-            # basis_10 ke basis_2
-            basis_2.append(konversiBilangan(angka_basis_10,10,2))
-
-            # basis_10 ke basis_8
-            basis_8.append(konversiBilangan(angka_basis_10,10,8))
-
-            # basis_10 ke basis_16
-            basis_16.append(konversiBilangan(angka_basis_10,10,16))
-
-        template_view = '''
-                  <form method="post">
-                      <h2>
-                        <!--- <p style="text-decoration: underline;"> --->
-                        <!---   Konversi Basis "10" | --->
-                        <!---   "2" | --->
-                        <!---   "8" | --->
-                        <!---   "16": --->
-                        <!--- </p> --->
-                        <p style="text-decoration: underline;">
-                          Konversi Basis "10" |
-                          "2" |
-                          "8" |
-                          "16":
-                        </p>
-                      </h2>
-                      Masukkan Batas Generate Konversi = <input type="text" name="a" value="{{a_post}}" />
-                      <input type="submit" value="Klik Run"/>
-                      <br>
-                      <table border ="1">
-                            <tr>
-                              <td align = "center">&nbsp; Decimal ( base r=10 ) &nbsp;</td>
-                              <td align = "center">&nbsp; Binary ( base r=2) &nbsp;</td>
-                              <td align = "center">&nbsp; Octal ( base r=8 ) &nbsp;</td>
-                              <td align = "center">&nbsp; Hexadecimal ( base r=16 ) &nbsp;</td>
-                            </tr>
-                            {% for angka_basis_10, angka_basis_2, angka_basis_8, angka_basis_16  in basis_all  %}
-                            <tr>
-                              <td align = "center">{{angka_basis_10}}</td>
-                              <td align = "center">{{angka_basis_2}}</td>
-                              <td align = "center">{{angka_basis_8}}</td>
-                              <td align = "center">{{angka_basis_16}}</td>
-                            </tr>
-                            {% endfor %}
-                      </table>
-                  </form>
-            '''
-        return render_template_string(A_a+template_view+Z_z, a_post = dec-1, basis_all = zip(basis_10, basis_2, basis_8, basis_16))
-    else: # untuk yang 'GET' data awal untuk di send ke /code_2_1_2_2
-        template_view = '''
-                  <form action="/code_2_1_2_2" method="post">
-                      <h2>
-                        <!--- <p style="text-decoration: underline;"> --->
-                        <!---   Konversi Basis "10" | --->
-                        <!---   "2" | --->
-                        <!---   "8" | --->
-                        <!---   "16": --->
-                        <!--- </p> --->
-                        <p style="text-decoration: underline;">
-                          Konversi Basis "10" |
-                          "2" |
-                          "8" |
-                          "16":
-                        </p>
-                      </h2>
-                      Masukkan Batas Generate Konversi = <input type="text" name="a" value="{{a_post}}" />
-                      <input type="submit" value="Klik Run"/>
-                      <br>
-                  </form>
-            '''
-
-        return render_template_string(A_a+template_view+Z_z)
-
-# End =============================
-# 2.1 Pengantar Sistem Bilangan
-# ===================================
-
-# Start =============================
-# 2.2 Logika Proposisi
-# ===================================
-
-@app.route('/code_2_2_1')
-def code_2_2_1():
-    # mencoba operator logika "and", "or", "negation" & "xor"
-    import numpy as np
-
-    a = 10
-    b = 4
-
-    list_hasil = []
-    list_hasil.append(str(a))
-    list_hasil.append(str(np.binary_repr(a, width=8)))
-    list_hasil.append(str(b))
-    list_hasil.append(str(np.binary_repr(b, width=8)))
-    list_hasil.append(str(np.binary_repr(a & b, width=8)))
-    list_hasil.append(str(np.binary_repr(a | b, width=8)))
-    list_hasil.append(str(np.binary_repr(~a, width=8)))
-    list_hasil.append(str(np.binary_repr(a ^ b, width=8)))
-
-    # &nbsp; adalah spasi
-
-    template_view = '''
-        <!--- <html> --->
-        <!--- <head> --->
-        <!--- </head> --->
-        <!--- <body> --->
-
-              <h2><p style="text-decoration: underline;">Mencoba Konversi Dec2Bin & Operasi logika: </p></h2>
-
-              <table border ="1">
-
-                    <tr>
-                      <td align = "center">&nbsp; a = &nbsp;</td>
-                      <td align = "center">&nbsp; {{ pro_utk_tabel[0] }} (Basis 10) = &nbsp; </td>
-                      <td align = "center">&nbsp; {{ pro_utk_tabel[1] }} (Basis 2) &nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td align = "center">b =</td>
-                      <td align = "center">{{ pro_utk_tabel[2] }} (Basis 10) = </td>
-                      <td align = "center">{{ pro_utk_tabel[3] }} (Basis 2)</td>
-                    </tr>
-
-              </table>
-
-              <br>
-
-              <form method="post">
-                <table border ="1">
-                    <tr>
-                      <td align = "center">&nbsp; Operasi AND &nbsp;</td>
-                      <td align = "center">&nbsp; Operasi OR &nbsp;</td>
-                      <td align = "center">&nbsp; Operasi NOT &nbsp;</td>
-                      <td align = "center">&nbsp; Operasi XOR &nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td align = "center">&nbsp; {{ pro_utk_tabel[4] }} &nbsp;</td>
-                      <td align = "center">&nbsp; {{ pro_utk_tabel[5] }} &nbsp;</td>
-                      <td align = "center">&nbsp; {{ pro_utk_tabel[6] }} &nbsp;</td>
-                      <td align = "center">&nbsp; {{ pro_utk_tabel[7] }} &nbsp;</td>
-                    </tr>
-                </table>
-
-              </form>
-
-            <!--- </body> --->
-        <!--- </html> --->
-        '''
-
-    return render_template_string(A_a+template_view+Z_z, pro_utk_tabel = list_hasil)
-
-@app.route('/code_2_2_2')
-def code_2_2_2():
-    # Contoh Latihan Soal:
-    # -------------------------
-    # Si A, Si B, Si C adalah beberapa orang yang terdakwa kasus kriminal.
-    # Mereka telah tertangkap dan sedang dalam proses diinterogasi oleh Detektif Conan dengan alat poligraph dengan didapatkan pernyatan berikut:
-    # +> Si A berkata  : Si B bersalah dan Si C tidak bersalah
-    # +> Si B berkata	 : Jika Si A bersalah maka Si C bersalah,
-    # +> Si C berkata  : Saya tidak bersalah, tetapi Si B atau Si A bersalah.
-
-    # (a) Tuliskan pernyataan dari semua yang terdakwa ke dalam bentuk logika proposisi.
-    #     Lalu buatkan tabel kebenarannya.
-    # (b) Tentukan siapa saja yang bersalah (berdasarkan tabel kebenaran tersebut),
-    #     bila ternyata hasil tes poligraph memberikan indikasi bahwa Si B telah berbohong,
-    #     sementara kedua temannya mengatakan kebenaran!
-
-    # Jawaban:
-    # ----------------
-    # Berdasarkan dari soal, misal digunakan simbolisasi seperti berikut,
-    # p: Si A tidak bersalah
-    # q: Si B tidak bersalah
-    # r: Si C tidak bersalah
-
-    # Hasil pembuatan Logika Proposisi:
-    # Si A : (~q)∧ r
-    # Si B : (~p) → (~r)
-    # Si C : r ∧ ((~p) ∨ (~q))
-
-    # penentuan jumlah himpunan bagian
-    byk_simbol = 3 # dari p, q, r
-    byk_himp_bagian = 2**byk_simbol # menyatakan banyak baris tabel
-    # print(byk_himp_bagian)
-    rasio = 0.5 # untuk deret geometri dari misal 8 => 4, 2, 1
-    # pro menyatakan nilai kebenaran proposisi (bisa T/F)
-    # misal pro1 mewakili kolom p
-    #       pro2 mewakili kolom q
-    #       pro3 mewakili kolom r
-    #       .. dst
-    #
-    # pro = np.zeros(byk_himp_bagian,byk_simbol)
-    import numpy as np
-    pro = np.chararray((byk_himp_bagian,byk_simbol))
-
-    for i in range(byk_simbol):
-      loop = int((byk_himp_bagian/2)*(rasio**i))
-      # print(loop)
-      loop_div = int(byk_himp_bagian/loop)
-      cur = 'T'
-      Temp_hasil=[]
-      for j in range(loop_div):
-        if(j==0 or cur == 'T'):
-          for letter in 'T'*loop:
-            Temp_hasil.append(letter)
-          # print('T'*loop, end='')
-          cur = 'F'
-        elif(cur == 'F'):
-          for letter in 'F'*loop:
-            Temp_hasil.append(letter)
-          # print('F'*loop, end='')
-          cur = 'T'
-      # print()
-      # print(Temp_hasil)
-      pro[:,i] = Temp_hasil
-      # print()
-
-    byk_logic = 3
-    pro_hasil_logic = np.chararray((byk_himp_bagian,byk_logic))
-    for idx, proposisi_in in enumerate(pro.decode().tolist()):
-        p_in = True if proposisi_in[0] == 'T' else False
-        q_in = True if proposisi_in[1] == 'T' else False
-        r_in = True if proposisi_in[2] == 'T' else False
-
-        # print(idx)
-        # print(proposisi_in)
-
-        Temp_hasil = []
-
-        # ((~q)∧ r)
-        Temp_hasil.append('T' if ((not q_in) and r_in) else 'F')
-
-        #  ~p --> ~r = ~(~p) V ~r
-        Temp_hasil.append('T' if ((not (not p_in)) or (not r_in)) else 'F')
-
-        #  (r ∧ ((~p) ∨ (~q)))
-        Temp_hasil.append('T' if (r_in and (not p_in or not q_in)) else 'F')
-        pro_hasil_logic[idx,:] = Temp_hasil
-
-    # pembuatan tabel kebenaran:
-    # ------------------------------------------------------------------------------------------------
-    # |  p 	|	q 	|	r	|	Si A ((~q)∧ r)  | Si B ((~p) → (~r)) |   Si C (r ∧ ((~p) ∨ (~q)))	|
-    # ------------------------------------------------------------------------------------------------
-    # |  T	|	T	|	T	|			F		|			T		 |				F				 |
-    # |  T	|	T	|	F	|			F		|			T		 | 				F				 |
-    # |  T	|   F	|   T	|           T	    |           T        |          	T                |
-    # |  T	|   F	|   F	|           F    	|           T	     |              F                |
-    # |  F	|   T	|   T	|           F	    |           F	     |              T                |
-    # |  F	|   T   |	F	|           F	    |           T	     |              F                |
-    # |  F	|   F	|   T	|           T	    |           F	     |              T                |
-    # |  F  |	F	|   F	|           F	    |           T	     |              F                |
-    # ------------------------------------------------------------------------------------------------
-
-    template_view = '''
-        <!--- <html> --->
-        <!--- <head> --->
-        <!--- </head> --->
-        <!--- <body> --->
-
-              <h2>
-                <p style="text-decoration: underline;">
-                  Mencoba membuat Tabel Kebenaran:
-                </p>
-              </h2>
-              <table border ="1">
-                    <tr>
-                      <td align = "center">&nbsp; p &nbsp;</td>
-                      <td align = "center">&nbsp; q &nbsp;</td>
-                      <td align = "center">&nbsp; r &nbsp;</td>
-                      <td align = "center">&nbsp; Si A ((~q)∧ r) &nbsp;</td>
-                      <td align = "center">&nbsp; Si B ((~p) → (~r)) &nbsp;</td>
-                      <td align = "center">&nbsp; Si C (r ∧ ((~p) ∨ (~q))) &nbsp;</td>
-                    </tr>
-                    {% for pro_init, pro_hasil  in pro_utk_tabel  %}
-                    <tr>
-                      <td align = "center">{{ pro_init[0] }}</td>
-                      <td align = "center">{{ pro_init[1] }}</td>
-                      <td align = "center">{{ pro_init[2] }}</td>
-                      <td align = "center">{{ pro_hasil[0] }}</td>
-                      <td align = "center">{{ pro_hasil[1] }}</td>
-                      <td align = "center">{{ pro_hasil[2] }}</td>
-                    </tr>
-                    {% endfor %}
-              </table>
-
-        <!--- </body> --->
-        <!--- </html> --->
-        '''
-
-    return render_template_string(A_a+template_view+Z_z, pro_utk_tabel = zip(pro.decode().tolist(), pro_hasil_logic.decode().tolist()))
-
-# End =============================
-# 2.2 Logika Proposisi
-# ===================================
 
 @app.route('/db/<aksi>')
 def manipulate_tabel(aksi):
