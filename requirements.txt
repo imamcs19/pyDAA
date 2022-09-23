@@ -5,4 +5,4 @@ flask_migrate
 pyzbar
 numba
 tensornetwork
-pennylane pennylane-sf
+pennylane-sf
