@@ -178,6 +178,13 @@ def tugas_project_ke_2_regresi():
     # plt.plot(x, y, color='red')
     # plt.show()
 
+    y_aktual = dataset[:,1]
+    y_predict = b0 + b1*dataset[:,0]
+    y_predict = np.round(y_predict, 2)
+
+    # hitung nilai evaluasi, misal dengan MAPE
+    nilai_mape = mape_value(y_aktual,y_predict)
+
     def fn_reg(dataset):
         # Solusi dengan Gradient Descent 2D::
         alpha=0.00001 #learning rate
@@ -224,6 +231,10 @@ def tugas_project_ke_2_regresi():
                     <br>
                     Data: <br>
                     {{ dataset}}
+                    <br>
+                    Y Aktual = {{ y_aktual}}
+                    <br>
+                    Y Predik = {{y_predict}}
                     <br><br>
                   </form>
                   <h2>Hasil:  </h2>
@@ -235,7 +246,7 @@ def tugas_project_ke_2_regresi():
                   <h2>Plot Waktu by Timer:  </h2>
                   <img src={{url_image}} alt="Chart" height="480" width="640">
                   <br>
-                   <h2>Plot Regresi Linier:  </h2>
+                   <h2>Plot Regresi Linier (Nilai MAPE = {{'%0.2f'|format(nilai_mape|float)}}%):  </h2>
                   <img src={{image_regresi}} alt="Chart" height="480" width="640">
 
             <!--- </body> --->
@@ -321,8 +332,46 @@ def tugas_project_ke_2_regresi():
     plt.savefig(url_file_image_simpan)
 
     # return hasil
-    return render_template_string(A_a+template_view+Z_z, dataset = dataset, hasil = hasil, image_regresi = pngImageB64String, url_image = url_simpan)
+    return render_template_string(A_a+template_view+Z_z, dataset = dataset, y_aktual = y_aktual, y_predict = y_predict, hasil = hasil, image_regresi = pngImageB64String, url_image = url_simpan, nilai_mape = nilai_mape)
 
+def mape_value(aktual, predict):
+
+    #  5. hitung nilai evaluasi, misal menggunakan MAPE
+    # buat def myMAPE yg return-nya detail_mape, final_single_mape = myMAPE(....)
+    #
+    # Rumus MAPE yang digunakan, jika data aktualnya ada yang nol atau tidak ada yg nol
+    # dan untuk memastikan MAPE pada interval = [0%;100%] --> dengan kondisi ini
+    # Ref: (Berretti,Thampi,danSrivastava,2015) dalam
+    # Hapsari,KD.,Cholissodin,I.,Santoso,E.,2016 --> link: https://bit.ly/2EJRzXE
+    #
+    konstanta_smooting = 0.00000001
+    c = konstanta_smooting
+
+    # aktual = (np_raw_target_by_non_rdd_data_test.copy())
+    # predict = (y_topi.copy())
+
+    # aktual = labels.copy()
+    # predict = predictions.copy()
+
+    if predict.ndim == 1: # untuk target 1Dim
+      byk_target_by_non_rdd = 1
+    else: # untuk target 2Dim
+      byk_target_by_non_rdd = predict.shape[1]
+
+    mape_init = np.abs((( (aktual+c) - (predict+c) )/ (aktual+c) )*100)
+    # mape_norm = np.sum(np.where(mape_init>100, 100, mape_init))/(len(predict)*byk_fitur_by_non_rdd)
+    mape_norm = np.sum(np.where(mape_init>100, 100, mape_init))/(len(predict)*byk_target_by_non_rdd)
+    #print('MAPE Norm [0% ; 100%] = ', mape_norm.round(2),'%')
+
+    #print()
+
+    # detail mape
+    #print('mape_init = ', mape_init.round(2),'%')
+    #print(mape_init.shape)
+
+    loss = mape_norm.copy()
+
+    return loss
 
 # from re import M
 
