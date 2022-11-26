@@ -101,6 +101,278 @@ Z_z = FrameWeb_bawah
 # def hello_daa():
 #    return 'Hello Students | Koding Desain dan Analisis Algoritma (DAA) pada Teknologi Cloud :D'
 
+
+@app.route('/tugas_project_ke_2_regresi', methods=['GET'])
+def tugas_project_ke_2_regresi():
+
+    import time
+    import os.path
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    # Study Kasus ke-1: Prediksi Harga Rumah (Regresi)
+    # Study Kasus Regresi:
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    dataset = np.array([[41,1250],
+                       [54,1380],
+                       [63,1425],
+                       [54,1425],
+                      [48,1450],
+                      [46,1300],
+                      [62,1400],
+                      [61,1510],
+                      [64,1575],
+                      [71,1650]])
+    print(dataset)
+
+    # No X Y
+    # 1 41 1250
+    # 2 54 1380
+    # 3 63 1425
+    # 4 54 1425
+    # 5 48 1450
+    # 6 46 1300
+    # 7 62 1400
+    # 8 61 1510
+    # 9 64 1575
+    # 10 71 1650
+
+    # Solusi dengan Gradient Descent 2D::
+    alpha=0.00001 #learning rate
+    [byk_data,dim]=dataset.shape
+
+    # inisialisasi b0 dan b1
+    b0=0.0
+    b1=0.0
+
+    byk_iter=1000;
+    for j in range(1,byk_iter+1):
+      sum_error=0.0
+      for i in range(0,byk_data):
+        x=dataset[i,0]
+        y=dataset[i,1]
+        y_topi=b0 + b1*x
+        error=(y_topi-y)
+        sum_error=sum_error+(error**2)
+        # update nilai b0 dan b1
+        b0=b0-alpha*error
+        b1=b1-alpha*error*x
+
+    print()
+    print('b0 =',b0)
+    print('b1 =',b1)
+    print('Y = b0 + b1*X = ', b0,' + ',b1,'*X')
+
+    # # ploting
+    # plt.title('Regresi Linier:')
+    # plt.xlabel('Ukuran Rumah')
+    # plt.ylabel('Harga Rumah (x 50K)')
+    #plt.plot(dataset)
+    # plt.scatter(dataset[:,0], dataset[:,1])
+
+    # plot garis regresi
+    x = np.arange(40,80)
+    y = b0 + b1*x
+    # plt.plot(x, y, color='red')
+    # plt.show()
+
+    y_aktual = dataset[:,1]
+    y_predict = b0 + b1*dataset[:,0]
+    y_predict = np.round(y_predict, 2)
+
+    # hitung nilai evaluasi, misal dengan MAPE
+    nilai_mape = mape_value(y_aktual,y_predict)
+
+    def fn_reg(dataset):
+        # Solusi dengan Gradient Descent 2D::
+        alpha=0.00001 #learning rate
+        [byk_data,dim]=dataset.shape
+
+        # inisialisasi b0 dan b1
+        b0=0.0
+        b1=0.0
+
+        byk_iter=1000;
+        for j in range(1,byk_iter+1):
+          sum_error=0.0
+          for i in range(0,byk_data):
+            x=dataset[i,0]
+            y=dataset[i,1]
+            y_topi=b0 + b1*x
+            error=(y_topi-y)
+            sum_error=sum_error+(error**2)
+            # update nilai b0 dan b1
+            b0=b0-alpha*error
+            b1=b1-alpha*error*x
+
+        # plot garis regresi
+        x = np.arange(np.min(dataset[:,0])-5,np.max(dataset[:,0])+5)
+        y = b0 + b1*x
+        # plt.plot(x, y, color='red')
+        # plt.show()
+
+        return b0,b1,x,y
+
+
+    template_view = '''
+            <!--- <html> --->
+            <!--- <head> --->
+            <!--- </head> --->
+            <!--- <body> --->
+            <h2>
+                <p style="text-decoration: underline;">
+                  Log Analisis Algoritma Regresi dgn Timer:
+                </p>
+            </h2>
+                  <form method="post">
+                    Input Size (N) = {{ dataset|length }}
+                    <br>
+                    Data: <br>
+                    {{ dataset}}
+                    <br>
+                    Y Aktual = {{ y_aktual}}
+                    <br>
+                    Y Predik = {{y_predict}}
+                    <br><br>
+                  </form>
+                  <h2>Hasil:  </h2>
+                  {% for data_hasil in hasil  %}
+                    {{ data_hasil }}
+                    <br>
+                  {% endfor %}
+
+                  <h2>Plot Waktu by Timer:  </h2>
+                  <img src={{url_image}} alt="Chart" height="480" width="640">
+                  <br>
+                   <h2>Plot Regresi Linier (Nilai MAPE = {{'%0.2f'|format(nilai_mape|float)}}%):  </h2>
+                  <img src={{image_regresi}} alt="Chart" height="480" width="640">
+
+            <!--- </body> --->
+            <!--- </html> --->
+        '''
+
+
+    input_size = 30
+    array_waktu_dalam_detik = np.zeros([input_size,2])
+
+    hasil_temp_b0 = []
+    hasil_temp_b1 = []
+    for i in range(input_size):
+        if i == 0:
+             dataset_Temp = np.zeros(shape=((i+1)*10, 2))
+             dataset_Temp = dataset.copy()
+        else:
+            randomData_x = random.sample(range(0, 1000), ((i+1)*10))
+            randomData_factor = random.sample(range(0, 11), 1)
+            randomData_factor = randomData_factor[0]/10
+            randomData_y = 2.*float(randomData_factor)* np.array(randomData_x)
+            dataset_Temp = np.zeros(shape=((i+1)*10, 2))
+            dataset_Temp[:,0] = np.array(randomData_x)
+            dataset_Temp[:,1] = randomData_y
+
+        start_time = time.time()
+
+        hasil_temp_b0,hasil_temp_b1,hasil_temp_x,hasil_temp_y = fn_reg(dataset_Temp)
+
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+
+        # hasil_save_b0.append(hasil_temp_b0)
+        # hasil_save_b1.append(hasil_temp_b1)
+
+        np.set_printoptions(suppress=True)
+        array_waktu_dalam_detik[i][0] = round((i+1),0)
+        array_waktu_dalam_detik[i][1] = round(elapsed_time,6)
+        #print()
+
+        hasil = []
+        for idx, time_val in enumerate(list(array_waktu_dalam_detik[:,1])):
+            hasil.append('Input Size (N) = ' + str((idx+1)*10) + ', dgn waktu  ' +str('{0:.10f}'.format(time_val)) + ' (detik)')
+
+    # plot hasil waktunya
+    n=list(range(1,input_size+1))
+
+    # Cara ke-1 => untuk plot Regresi
+    # Generate plot
+    fig = Figure()
+    axis = fig.add_subplot(1, 1, 1)
+    axis.set_title("Plot Data Regresi Linier")
+    axis.set_xlabel("Ukuran Rumah")
+    axis.set_ylabel("Harga Rumah (x 50K)")
+    axis.grid()
+    # print('Y = b0 + b1*X = ', b0,' + ',b1,'*X')
+    axis.scatter(dataset[:,0], dataset[:,1])
+    axis.plot(x, y, 'r.-', label='Y = b0 + b1*X = ' + str(b0) +' + ' + str(b1) +'*X')
+
+    axis.legend(loc="upper left")
+
+    # Convert plot to PNG image
+    pngImage = io.BytesIO()
+    FigureCanvas(fig).print_png(pngImage)
+
+    # Encode PNG image to base64 string
+    pngImageB64String = "data:image/png;base64,"
+    pngImageB64String += base64.b64encode(pngImage.getvalue()).decode('utf8')
+
+    # Cara ke-2 => untuk plot Regresi by Timer
+    # simpan dalam path + nama file /static/img/new_timer.png
+    url_simpan = "static/img/new_timer.png"
+
+    fig = plt.figure()
+    plt.plot(n,list(array_waktu_dalam_detik[:,1][:len(n)]), 'g.-', label='Regresi by Timer') # TimSort
+
+    plt.xlabel('Banyak Data (N) x 10')
+    plt.ylabel('Waktu Komputasi')
+    plt.legend(loc="upper left")
+    plt.show()
+
+    url_file_image_simpan = os.path.join(BASE_DIR, url_simpan)
+    plt.savefig(url_file_image_simpan)
+
+    # return hasil
+    return render_template_string(A_a+template_view+Z_z, dataset = dataset, y_aktual = y_aktual, y_predict = y_predict, hasil = hasil, image_regresi = pngImageB64String, url_image = url_simpan, nilai_mape = nilai_mape)
+
+def mape_value(aktual, predict):
+
+    #  5. hitung nilai evaluasi, misal menggunakan MAPE
+    # buat def myMAPE yg return-nya detail_mape, final_single_mape = myMAPE(....)
+    #
+    # Rumus MAPE yang digunakan, jika data aktualnya ada yang nol atau tidak ada yg nol
+    # dan untuk memastikan MAPE pada interval = [0%;100%] --> dengan kondisi ini
+    # Ref: (Berretti,Thampi,danSrivastava,2015) dalam
+    # Hapsari,KD.,Cholissodin,I.,Santoso,E.,2016 --> link: https://bit.ly/2EJRzXE
+    #
+    konstanta_smooting = 0.00000001
+    c = konstanta_smooting
+
+    # aktual = (np_raw_target_by_non_rdd_data_test.copy())
+    # predict = (y_topi.copy())
+
+    # aktual = labels.copy()
+    # predict = predictions.copy()
+
+    if predict.ndim == 1: # untuk target 1Dim
+      byk_target_by_non_rdd = 1
+    else: # untuk target 2Dim
+      byk_target_by_non_rdd = predict.shape[1]
+
+    mape_init = np.abs((( (aktual+c) - (predict+c) )/ (aktual+c) )*100)
+    # mape_norm = np.sum(np.where(mape_init>100, 100, mape_init))/(len(predict)*byk_fitur_by_non_rdd)
+    mape_norm = np.sum(np.where(mape_init>100, 100, mape_init))/(len(predict)*byk_target_by_non_rdd)
+    #print('MAPE Norm [0% ; 100%] = ', mape_norm.round(2),'%')
+
+    #print()
+
+    # detail mape
+    #print('mape_init = ', mape_init.round(2),'%')
+    #print(mape_init.shape)
+
+    loss = mape_norm.copy()
+
+    return loss
+
 # from re import M
 
 def listToString(aList):
@@ -232,7 +504,7 @@ def code_timsort():
         '''
 
 
-    input_size = 10
+    input_size = 30
     array_waktu_dalam_detik = np.zeros([input_size,2])
     data_sblm_sort = []
     data_stlh_sort = []
@@ -322,6 +594,182 @@ def code_timsort():
 
     # return hasil
     return render_template_string(A_a+template_view+Z_z, data_sblm_stlh = zip(data_sblm_sort, data_stlh_sort), hasil = hasil, image_timer = pngImageB64String, url_image = url_simpan)
+
+@app.route('/code_unik_elemen', methods=['GET'])
+def code_unik_elemen():
+
+    # /**
+    #  *
+    #  * @author Imam Cholissodin
+    #  *
+    #  * Contoh Membuat Koding Algoritma uniqueElement
+    #  */
+
+    def uniqueElement(A):
+      n = len(A)
+      for i in range(0,n-1,1):
+        for j in range(i+1,n,1):
+          if(A[i]==A[j]):
+            return 'False'
+      return 'True'
+
+    # if __name__ == '__main__':
+    # A = [9,87,52,3,33,58,74,57,89,57,48,61,33,83,28]
+    A = [6,9,12,58,39,10,53,82,90]
+
+    # print("Cek keunikan = ", uniqueElement(A))
+
+    return uniqueElement(A)
+
+    # return 'Silahkan koding Alg. Unik Elemen disini'
+
+@app.route('/code_4_4', methods=['GET'])
+def code_4_4():
+
+    import time
+    import os.path
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    def uniqueElement(A):
+      n = len(A)
+      for i in range(0,n-1,1):
+        for j in range(i+1,n,1):
+          if(A[i]==A[j]):
+            return 'False'
+      return 'True'
+
+    template_view = '''
+            <!--- <html> --->
+            <!--- <head> --->
+            <!--- </head> --->
+            <!--- <body> --->
+            <h2>
+                <p style="text-decoration: underline;">
+                  Log Analisis Algoritma Unik Elemen dgn Timer:
+                </p>
+            </h2>
+                  <form method="post">
+                   {%for data_get in data_sblm_stlh %}
+                    Input Size (N) = {{ loop.index }}
+                    <br>
+                    Data Sebelum dicek Uniknya: <br>
+                    {{ data_get[0] }}
+                    <br>
+                    Hasil cek Uniknya: <br>
+                    {{ data_get[1] }}
+                    <br><br>
+                   {%endfor%}
+                  </form>
+                  <h2>Hasil:  </h2>
+                  {% for data_hasil in hasil  %}
+                    {{ data_hasil }}
+                    <br>
+                  {% endfor %}
+
+                  <h2>Plot Waktu by Timer:  </h2>
+                  <img src={{url_image}} alt="Chart" height="480" width="640">
+                  <br>
+                  <img src={{image_timer}} alt="Chart" height="480" width="640">
+
+            <!--- </body> --->
+            <!--- </html> --->
+        '''
+
+
+    input_size = 30
+    array_waktu_dalam_detik = np.zeros([input_size,2])
+    data_sblm_cek_unik = []
+    # data_stlh_sort = []
+    hasil_cek_unik = []
+    for i in range(input_size):
+        randomData = random.sample(range(0, 1000), (i+1))
+        data_sblm_cek_unik.append(listToString(randomData))
+        start_time = time.time()
+        listData = randomData
+
+        # print(f'Data sebelum sorted : {stringToFloat}')
+        hasil_temp = uniqueElement(listData) # bisa diganti dengan fibo/ unique element
+        # print(f'Data setelah sorted : {listData}')
+
+        # y = (len(listData)) - 1
+
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+
+        # hasil_cek_unik.append(listToString(hasil_temp))
+        hasil_cek_unik.append(hasil_temp)
+
+
+        # print('Waktu dengan Timer (detik): ', elapsed_time, ' vs Waktu dengan T(n) = ',(i+1), 'Log (',(i+1),'): ', (i+1)*np.log2(i+1))
+        np.set_printoptions(suppress=True)
+        array_waktu_dalam_detik[i][0] = round((i+1),0)
+        array_waktu_dalam_detik[i][1] = round(elapsed_time,6)
+        #print()
+
+        hasil = []
+        for idx, time_val in enumerate(list(array_waktu_dalam_detik[:,1])):
+            hasil.append('Input Size (N) = ' + str(idx+1) + ', dgn waktu  ' +str('{0:.10f}'.format(time_val)) + ' (detik)')
+
+    # plot hasil waktunya
+    n=list(range(1,input_size+1))
+
+    # Cara ke-1
+    # Generate plot
+    fig = Figure()
+    axis = fig.add_subplot(1, 1, 1)
+    axis.set_title("Plot Waktu by Timer Alg. Timsort")
+    axis.set_xlabel("Banyak Data (N)")
+    axis.set_ylabel("Waktu Komputasi")
+    axis.grid()
+    axis.plot(n, [x*math.log(x,2) for x in n], 'r.-', label='TimSort by T(n)')
+    axis.plot(n,list(array_waktu_dalam_detik[:,1][:len(n)]), 'go-', label='TimSort by Timer')
+    # axis.plot(range(5), range(5), "ro-")
+
+    # legend = axis.legend(loc='upper center', shadow=True, fontsize='x-large')
+
+    # # Put a nicer background color on the legend.
+    # legend.get_frame().set_facecolor('C0')
+
+    axis.legend(loc="upper left")
+
+    # Convert plot to PNG image
+    pngImage = io.BytesIO()
+    FigureCanvas(fig).print_png(pngImage)
+
+    # Encode PNG image to base64 string
+    pngImageB64String = "data:image/png;base64,"
+    pngImageB64String += base64.b64encode(pngImage.getvalue()).decode('utf8')
+
+    # Cara ke-2
+    # simpan dalam path + nama file /static/img/new_timer.png
+    url_simpan = "static/img/new_timer.png"
+
+    fig = plt.figure()
+    # plt.plot(n, [math.log(x,2) for x in n], 'g.-', label='logN') # logN
+    # plt.plot(n, n, 'b.-', label='N') # N
+    plt.plot(n, [(x**2 - x)/2 for x in n], 'r.-', label='Unique Element by T(n)') # (N^2 - N)/2
+    # plt.plot(n, [x*x for x in n], 'r.-') # N^2
+    # plt.plot(n, [x*x*x for x in n], 'r.-') # N^3
+    # plt.plot(n, [math.pow(2,x) for x in n], 'r.-') # 2^N
+    # plt.plot(n, [math.factorial(x) for x in n], 'r.-') # N!
+    plt.plot(n,list(array_waktu_dalam_detik[:,1][:len(n)]), 'g.-', label='Unique Element by Timer') # TimSort
+
+    plt.xlabel('Banyak Data (N)')
+    plt.ylabel('Waktu Komputasi')
+    plt.legend(loc="upper left")
+    plt.show()
+
+    url_file_image_simpan = os.path.join(BASE_DIR, url_simpan)
+    plt.savefig(url_file_image_simpan)
+
+    # Cara ke-3
+    # /bokeh
+
+
+    # return hasil
+    return render_template_string(A_a+template_view+Z_z, data_sblm_stlh = zip(data_sblm_cek_unik, hasil_cek_unik), hasil = hasil, image_timer = pngImageB64String, url_image = url_simpan)
+
 
 @app.route('/bokeh')
 def bokeh():
@@ -1008,7 +1456,10 @@ def page_not_found(error):
 
 @app.errorhandler(500)
 def internal_server_error(error):
-    return render_template("500.html")
+    userhome = os.path.expanduser("~").split("/")[-1]
+    link_error_debug = "https://www.pythonanywhere.com/user/"+userhome+"/files/var/log/"+userhome+".pythonanywhere.com.error.log"
+
+    return render_template("500.html", link_error_debug = link_error_debug)
 
 @app.route('/iot', methods=["GET", "POST"])
 def iot():
