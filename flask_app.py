@@ -102,7 +102,7 @@ Z_z = FrameWeb_bawah
 #    return 'Hello Students | Koding Desain dan Analisis Algoritma (DAA) pada Teknologi Cloud :D'
 
 @app.route("/testView_dari_project2_regresi_sbg_fp", methods=['GET', 'POST'])
-def testView_dari_project2_sbg_fp():
+def testView_dari_project2_regresi_sbg_fp():
 
     template_view = '''
         <script type="text/javascript" src="{{ url_for('static', filename = 'js/jquery.min.js') }}"></script>
@@ -261,7 +261,7 @@ def testView_dari_project2_sbg_fp():
         return render_template_string(A_a+template_view+Z_z)
     
 @app.route("/testView_dari_project2_klasifikasi_sbg_fp", methods=['GET', 'POST'])
-def testView_dari_project2_sbg_fp():
+def testView_dari_project2_klasifikasi_sbg_fp():
 
     template_view = '''
         <script type="text/javascript" src="{{ url_for('static', filename = 'js/jquery.min.js') }}"></script>
