@@ -912,8 +912,8 @@ def code_timsort():
     # return hasil
     return render_template_string(A_a+template_view+Z_z, data_sblm_stlh = zip(data_sblm_sort, data_stlh_sort), hasil = hasil, image_timer = pngImageB64String, url_image = url_simpan)
 
-@app.route('/code_unik_elemen', methods=['GET'])
-def code_unik_elemen():
+@app.route('/unik_el', methods=['GET'])
+def unik_el():
 
     # /**
     #  *
@@ -940,8 +940,8 @@ def code_unik_elemen():
 
     # return 'Silahkan koding Alg. Unik Elemen disini'
 
-@app.route('/code_4_4', methods=['GET'])
-def code_4_4():
+@app.route('/unik_el_dgn_timer', methods=['GET'])
+def unik_el_dgn_timer():
 
     import time
     import os.path
