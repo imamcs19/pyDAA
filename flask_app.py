@@ -1980,6 +1980,608 @@ def scanner():
         else:
             break
 
+@app.route('/myadmin/', methods = ['GET','POST'])
+@app.route('/myadmin/<none_atau_lainnya>', methods = ['GET','POST'])
+def myadmin(none_atau_lainnya=None):
+
+    template_view = '''
+                <div class="row">
+                    <div class="col-12">
+                        <div class="white-box">
+                                <div class="card-body">
+                                    <form action="/myadmin" method="post">
+                                    <h4 class="card-title">Masukkan tabel yang akan dibuat</h4>
+                                    <h6 class="card-subtitle"></h6>
+                                    <button type="button" class="btn btn-info btn-rounded m-t-10 float-right" data-toggle="modal" data-target="#add-contact">Buat Tabel</button>
+
+                                    <!-- Add Contact Popup Model -->
+                                    <!--<div id="add-contact" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;"> -->
+                                    <div id="add-contact" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                                    <h4 class="modal-title" id="myModalLabel">Buat Tabel baru</h4> </div>
+                                                <div class="modal-body">
+                                                    <from class="form-horizontal form-material">
+                                                        <div class="form-group">
+                                                            <div class="col-md-12 m-b-20">
+                                                                <input type="text" name="nama_tabel" class="form-control" placeholder="Nama tabel" required="required"> </div>
+                                                            <div class="col-md-12 m-b-20">
+                                                                <textarea class="form-control" name="teks_sintaks" rows="4" placeholder="Teks sintaks"></textarea> </div>
+                                                        </div>
+                                                    </from>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-info waves-effect">Simpan</button>
+                                                    <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Batal</button>
+                                                    <!-- <button type="reset" class="btn btn-default waves-effect" data-dismiss="modal">Batal</button> -->
+                                                </div>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+
+                                    </form>
+
+                                    <div class="table-responsive">
+                                        <!-- <table id="footable-addrow" class="table table-bordered m-t-30 table-hover contact-list footable footable-5 footable-paging footable-paging-center breakpoint-lg" data-paging="true" data-paging-size="7" style=""> -->
+                                        <!-- <table id="footable-addrow" class="table footable footable-6 footable-editing footable-editing-right footable-editing-no-view footable-filtering footable-filtering-right footable-paging footable-paging-center breakpoint-lg" data-paging="true" data-filtering="true" data-sorting="true" data-editing="true" data-state="true" style=""> -->
+                                        <!-- <table id="example23" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%"> -->
+                                        <!-- <table id="footable-addrow" class="table" data-paging="true" data-filtering="true" data-sorting="true" data-editing="true" data-state="true">-->
+
+                                        <!-- <table id="example23" class="display nowrap table table-hover table-striped table-bordered" data-paging="true" data-filtering="true" data-sorting="true" data-editing="true" data-state="true">-->
+                                        <table id="example23" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                                        <!-- <table id="myTable" class="table table-striped"> -->
+                                            <thead>
+                                                <tr class="footable-header">
+                                                    <th style="display: table-cell;" class="footable-first-visible">No</th>
+                                                    <th style="display: table-cell;">Nama</th>
+                                                    <th style="display: table-cell;">Tanggal Pembuatan</th>
+                                                    <th style="display: table-cell;" class="th-inner">Teks Sintaks</th>
+                                                    <th style="display: table-cell;" class="footable-last-visible"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for item in var_tabel_myadmin %}
+                                                <tr class={{ loop.cycle('odd', 'even') }}>
+                                                    <td style="display: table-cell;" class="footable-first-visible">{{ loop.index }}</td>
+                                                    <td style="display: table-cell;">{{item[1]}}</td>
+                                                    <td style="display: table-cell;">{{item[2]}}</td>
+                                                    <td style="display: table-cell;">
+                                                        {{item[3]}} </td>
+                                                    <td style="display: table-cell;" class="footable-last-visible">
+
+                                                        <a href="" data-toggle="modal" data-target="#editor-modal{{item[1]}}">
+                                                        <button type="button" class="btn btn-info btn-outline btn-circle btn-lg m-r-5"><i class="ti-pencil-alt"></i></button></a>
+
+                                                        <!-- <a href="/myadmin/edit-nama_tabel_var-{{item[1]}}"> -->
+                                                        <!-- <button type="button" class="btn btn-info btn-outline btn-circle btn-lg m-r-5"><i class="ti-pencil-alt"></i></button></a> -->
+
+                                                        <!-- <a href="/myadmin/del-nama_tabel_var-{{item[1]}}"> -->
+                                                        <!-- <button type="button" class="btn btn-info btn-outline btn-circle btn-lg m-r-5"><i class="ti-trash"></i></button></a> -->
+
+                                                        <a href="" data-toggle="modal" data-target="#hapus-modal{{item[1]}}">
+                                                        <button type="button" class="btn btn-info btn-outline btn-circle btn-lg m-r-5"><i class="ti-trash"></i></button></a>
+
+
+                                                        <a href="/myadmin/run-nama_tabel_var-{{item[1]}}">
+                                                        <button type="button" class="btn btn-info btn-outline btn-circle btn-lg m-r-5"><i class="ti-control-play"></i></button></a>
+
+                                                        <!-- Start Popup Model utk Edit -->
+                                                        <!-- <div class="modal fade" id="editor-modal" tabindex="-1" role="dialog" aria-labelledby="editor-title"> -->
+                                                        <!-- <div id="editor-modal{{item[1]}}" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> -->
+                                                        <div class="modal fade in" id="editor-modal{{item[1]}}" tabindex="-1" role="dialog" aria-labelledby="editor-title">
+                                                            <!--<div class="modal-dialog" role="document"> -->
+                                                            <div class="modal-dialog">
+                                                                <form action="/myadmin/edit-nama_tabel_var-{{item[1]}}" class="modal-content form-horizontal" id="editor" method="post">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                                            <h4 class="modal-title" id="editor-title">Ubah Data ke-{{item[0]}}</h4>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <from class="form-horizontal form-material">
+                                                                                <div class="form-group">
+                                                                                    <label for="firstName" class="col-sm-3 control-label">Nama</label>
+                                                                                    <div class="col-sm-9">
+                                                                                        <input type="text" class="form-control" name="nama_tabel_edit_{{item[1]}}" value="{{item[1]}}" placeholder="Nama Tabel" readonly>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <!-- <div class="form-group"> -->
+                                                                                    <!-- <label for="dob" class="col-sm-3 control-label">Tanggal Pembuatan</label> -->
+                                                                                    <!-- <label class="col-sm-3 control-label">Tanggal Pembuatan</label> -->
+                                                                                    <!-- <div class="col-sm-9"> -->
+                                                                                        <!-- <input type="date" class="form-control" name="tgl_buat_tabel_edit" value="{{item[2]}}" placeholder="Tanggal Pembuatan Tabel"> -->
+                                                                                        <!-- <input type="date" data-date="" data-date-format="dd-mm-YYYY HH:MM:SS" class="form-control" name="tgl_buat_tabel_edit" value="{{item[2]}}" placeholder="Tanggal Pembuatan Tabel"> -->
+
+                                                                                    <!-- </div> -->
+                                                                                <!-- </div> -->
+                                                                                <div class="form-group">
+                                                                                    <label for="status" class="col-sm-3 control-label">Sintaks</label>
+                                                                                    <div class="col-sm-9">
+                                                                                        <!--input type="text" class="form-control" id="status" name="status" placeholder="Status Here" required> -->
+                                                                                        <textarea class="form-control" name="teks_sintaks_edit_{{item[1]}}" rows="4" placeholder="Teks sintaks">{{item[3]}}</textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </from>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <!-- <button type="submit" class="btn btn-primary">Save changes</button> -->
+                                                                            <!-- <a href="/myadmin/edit-nama_tabel_var-{{item[1]}}" class="btn btn-info" role="button">Simpan</a>-->
+                                                                            <!-- <button type="submit" class="btn btn-primary">Simpan</button>-->
+                                                                            <button type="submit" class="btn btn-info waves-effect">Simpan</button>
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </form>
+                                                            </div>
+                                                            <!-- /.modal-dialog -->
+                                                        </div>
+                                                        <!-- End Popup Model utk Edit -->
+
+                                                        <!-- Start Popup Model utk Hapus -->
+                                                        <div class="modal fade in" id="hapus-modal{{item[1]}}" tabindex="-1" role="dialog" aria-labelledby="editor-title">
+                                                            <div class="modal-dialog">
+                                                                <form action="/myadmin/del-nama_tabel_var-{{item[1]}}" class="modal-content form-horizontal" id="editor" method="post">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                                            <h4 class="modal-title" id="editor-title">Hapus Data ke-{{item[0]}}</h4>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <from class="form-horizontal form-material">
+                                                                                <div class="form-group">
+                                                                                    <label for="firstName" class="col-sm-3 control-label">Nama</label>
+                                                                                    <div class="col-sm-9">
+                                                                                        <input type="text" class="form-control" name="nama_tabel_hapus_{{item[1]}}" value="{{item[1]}}" placeholder="Nama Tabel" readonly>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="status" class="col-sm-3 control-label">Sintaks</label>
+                                                                                    <div class="col-sm-9">
+                                                                                        <!--input type="text" class="form-control" id="status" name="status" placeholder="Status Here" required> -->
+                                                                                        <textarea class="form-control" name="teks_sintaks_hapus_{{item[1]}}" rows="4" placeholder="Teks sintaks">{{item[3]}}</textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </from>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="submit" class="btn btn-info waves-effect">Hapus</button>
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </form>
+                                                            </div>
+                                                            <!-- /.modal-dialog -->
+                                                        </div>
+                                                        <!-- End Popup Model utk Hapus -->
+
+                                                        <!-- Start Popup Model utk Generate Kode untuk flask_app.py -->
+                                                        <div class="modal fade in" id="gen-modal{{item[1]}}" tabindex="-1" role="dialog" aria-labelledby="editor-title">
+                                                            <div class="modal-dialog">
+                                                                <form action="/myadmin/gen-nama_tabel_var-{{item[1]}}" class="modal-content form-horizontal" id="editor" method="post">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                                            <h4 class="modal-title" id="editor-title">Hapus Data ke-{{item[0]}}</h4>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <from class="form-horizontal form-material">
+                                                                                <div class="form-group">
+                                                                                    <label for="firstName" class="col-sm-3 control-label">Nama</label>
+                                                                                    <div class="col-sm-9">
+                                                                                        <input type="text" class="form-control" name="nama_tabel_gen_{{item[1]}}" value="{{item[1]}}" placeholder="Nama Tabel" readonly>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="status" class="col-sm-3 control-label">Sintaks</label>
+                                                                                    <div class="col-sm-9">
+                                                                                        <!--input type="text" class="form-control" id="status" name="status" placeholder="Status Here" required> -->
+                                                                                        <textarea class="form-control" name="teks_sintaks_tabel_gen_{{item[1]}}" rows="4" placeholder="Teks sintaks">{{item[3]}}</textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="status" class="col-sm-3 control-label">Generate Kode untuk flask_app.py</label>
+                                                                                    <div class="col-sm-9">
+                                                                                        <!--input type="text" class="form-control" id="status" name="status" placeholder="Status Here" required> -->
+                                                                                        <textarea class="form-control" name="teks_sintaks_page_gen_{{item[1]}}" rows="4" placeholder="Teks sintaks">{{item[3]}}</textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </from>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="submit" class="btn btn-info waves-effect">Hapus</button>
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </form>
+                                                            </div>
+                                                            <!-- /.modal-dialog -->
+                                                        </div>
+                                                        <!-- End Popup Model utk utk Generate Kode untuk flask_app.py -->
+
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- </form> -->
+                                </div>
+                            </div>
+
+
+
+                    </div>
+                </div>
+
+
+
+                <!--<script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_foo/footable.min.js') }}"></script>-->
+                <!--<script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_foo/custom.min.js') }}"></script>-->
+                <!--<script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_foo/footable-init.js') }}"></script>-->
+                <!--<script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_foo/jQuery.style.switcher.js') }}"></script>-->
+                <!--<script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_foo/jquery.min.js') }}"></script>-->
+                <!--<script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_foo/bootstrap.min.js') }}"></script>-->
+                <!--<script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_foo/jquery.slimscroll.js') }}"></script>-->
+                <!--<script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_foo/moment.js') }}"></script>-->
+                <!--<script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_foo/sidebar-nav.min.js') }}"></script>-->
+                <!--<script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_foo/waves.js') }}"></script>-->
+
+                <!-- There could be multiple reasons for this error. -->
+                    <!-- jQuery DataTables library is missing. -->
+                    <!-- jQuery library is loaded after jQuery DataTables. -->
+                    <!-- Multiple versions of jQuery library is loaded. -->
+
+
+                <!-- ./wrapper -->
+                <!-- REQUIRED SCRIPTS -->
+                <!-- jQuery -->
+                <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_suhu/jquery.min.js.download') }}"></script>
+                <!-- Bootstrap 4 -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_suhu/bootstrap.bundle.min.js.download') }}"></script> -->
+                <!-- AdminLTE App -->
+                <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_suhu/adminlte.min.js.download') }}"></script>
+                <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_suhu/sweetalert2-9.10.12.min.js.download') }}"></script>
+                <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_suhu/site.js.download') }}"></script>
+
+
+                <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_suhu/jquery.validate.min.js.download') }}"></script>
+                <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_suhu/jquery.validate.unobtrusive.min.js.download') }}"></script>
+                <!-- <script> -->
+                <!--$("#main_form").validate(); -->
+                <!-- </script> -->
+
+                <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/css_tabel_suhu/dataTables.bootstrap4.min.css') }}" />
+                <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_suhu/jquery.dataTables.min.js.download') }}"></script>
+                <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_suhu/dataTables.bootstrap4.min.js.download') }}"></script>
+
+
+                <!-- /#wrapper -->
+
+                <!-- Bootstrap Core JavaScript -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/bootstrap.min.js') }}"></script> -->
+                <!-- Menu Plugin JavaScript -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/sidebar-nav.min.js') }}"></script> -->
+                <!--slimscroll JavaScript -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/jquery.slimscroll.js') }}"></script> -->
+                <!--Wave Effects -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/waves.js') }}"></script> -->
+                <!-- Custom Theme JavaScript -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/custom.min.js') }}"></script> -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/datatables.min.js') }}"></script> -->
+                <!-- start - This is for export functionality only -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/dataTables.buttons.min.js') }}"></script> -->
+                <!-- jQuery -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/jquery.min.js') }}"></script> -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/buttons.flash.min.js') }}"></script> -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/jszip.min.js') }}"></script> -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/pdfmake.min.js') }}"></script> -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/vfs_fonts.js') }}"></script> -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/buttons.html5.min.js') }}"></script> -->
+                <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'js/mylib_tabel_data/buttons.print.min.js') }}"></script> -->
+                <!-- end - This is for export functionality only -->
+
+
+
+
+                <script>
+                    /*
+                    $(document).ready(function() {
+                        $('#myTable').DataTable();
+                        $(document).ready(function() {
+                            var table = $('#example').DataTable({
+                                "columnDefs": [{
+                                    "visible": false,
+                                    "targets": 2
+                                }],
+                                "order": [
+                                    [2, 'asc']
+                                ],
+                                "displayLength": 25,
+                                "drawCallback": function(settings) {
+                                    var api = this.api();
+                                    var rows = api.rows({
+                                        page: 'current'
+                                    }).nodes();
+                                    var last = null;
+                                    api.column(2, {
+                                        page: 'current'
+                                    }).data().each(function(group, i) {
+                                        if (last !== group) {
+                                            $(rows).eq(i).before('<tr class="group"><td colspan="5">' + group + '</td></tr>');
+                                            last = group;
+                                        }
+                                    });
+                                }
+                            });
+                            // Order by the grouping
+                            $('#example tbody').on('click', 'tr.group', function() {
+                                var currentOrder = table.order()[0];
+                                if (currentOrder[0] === 2 && currentOrder[1] === 'asc') {
+                                    table.order([2, 'desc']).draw();
+                                } else {
+                                    table.order([2, 'asc']).draw();
+                                }
+                            });
+                        });
+                    }); */
+                    $('#example23').DataTable({
+                        dom: 'Bfrtip',
+                        buttons: [
+                            'copy', 'csv', 'excel', 'pdf', 'print'
+                        ]
+                    });
+                    $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary m-r-10');
+                </script>
+            '''
+
+    if(none_atau_lainnya is not None):
+
+        list_none_atau_lainnya = none_atau_lainnya.split("-")
+        str_none_atau_lainnya = ' '.join(list_none_atau_lainnya)
+
+        # get jenis query edit atau del atau run
+        get_jenis_query = list_none_atau_lainnya[0]
+        get_nama_tabel = list_none_atau_lainnya[-1]
+
+        conn = connect_db()
+        db = conn.cursor()
+
+        if(get_jenis_query == 'edit'):
+
+            # var1_in_edit = request.form.get['nama_tabel_edit_'+get_nama_tabel]
+            var1_in_edit = request.form['nama_tabel_edit_'+get_nama_tabel]
+            # var1_in_edit = get_nama_tabel
+            # var2_in_edit = "CREATE TABLE IF NOT EXISTS data_tabel_myadmin (id INTEGER PRIMARY KEY AUTOINCREMENT, kolom1 TEXT, kolm2 DATETIME, kolom3 TEXT) ok"
+            # var2_in_edit = request.form.get['teks_sintaks_edit_'+get_nama_tabel]
+            var2_in_edit = request.form['teks_sintaks_edit_'+get_nama_tabel]
+
+            # if(request.form['teks_sintaks_edit'] is not None):
+            #     var2_in_edit = request.form['teks_sintaks_edit']
+            # else:
+            #     var2_in_edit = "CREATE TABLE IF NOT EXISTS data_tabel_myadmin (id INTEGER PRIMARY KEY AUTOINCREMENT, kolom1 TEXT, kolm2 DATETIME, kolom3 TEXT) ok"
+
+            # update pada Tabel data_tabel_myadmin, pada kolom teks_sintaks
+            db.execute("UPDATE data_tabel_myadmin SET teks_sintaks = ? WHERE nama_tabel = ?",(var2_in_edit, var1_in_edit))
+
+            conn.commit()
+
+        elif(get_jenis_query == 'del'):
+            var1_in_hapus = request.form['nama_tabel_hapus_'+get_nama_tabel]
+
+            # hapus data pada Tabel data_tabel_myadmin, pada kolom nama_tabel
+            db.execute("DELETE FROM data_tabel_myadmin WHERE nama_tabel = ?",(var1_in_hapus,))
+
+            conn.commit()
+
+        elif(get_jenis_query == 'gen'):
+
+            var1_in_gen = request.form['nama_tabel_gen_'+get_nama_tabel]
+            var2_in_gen = request.form['teks_sintaks_tabel_gen_'+get_nama_tabel]
+            var3_in_gen = request.form['teks_sintaks_page_gen_'+get_nama_tabel]
+
+            # hapus data pada Tabel data_tabel_myadmin, pada kolom nama_tabel
+            # db.execute("DELETE FROM data_tabel_myadmin WHERE nama_tabel = ?",(var1_in_hapus,))
+
+            # conn.commit()
+
+            # generate kode @app.route.. untuk flask_app.py
+            var3_in_gen += """
+
+
+
+            """
+
+        # return 'Hello ' + str_none_atau_lainnya + ' Tipe request = ' + request.method + ' ' + list_none_atau_lainnya[0]+ ' ' + list_none_atau_lainnya[-1]
+
+        # # menampilkan data dari tabel data_tabel_myadmin
+        # # conn = connect_db()
+        # # db = conn.cursor()
+
+        # c = db.execute(""" SELECT * FROM  data_tabel_myadmin """)
+
+        # var_tabel_myadmin_in = c.fetchall()
+
+        # conn.commit()
+        # # db.close()
+        # # conn.close()
+
+        db.close()
+        conn.close()
+
+        # return render_template_string(A_a+template_view+Z_z, var_tabel_myadmin = var_tabel_myadmin_in)
+
+        return redirect(url_for('myadmin'))
+
+    else:
+        # Aksi => Buat, Hapus Tabel data_tabel_myadmin
+        aksi = 'c'
+
+        if aksi == 'c':
+            conn = connect_db()
+            db = conn.cursor()
+
+            str_info = 'tabel berhasil dibuat :D'
+            # create tabel
+            db.execute("""
+            CREATE TABLE IF NOT EXISTS data_tabel_myadmin
+            (id INTEGER PRIMARY KEY AUTOINCREMENT, nama_tabel TEXT, date_pembuatan DATETIME,
+            teks_sintaks TEXT)
+            """)
+
+            conn.commit()
+
+        elif aksi== 'd':
+            conn = connect_db()
+            db = conn.cursor()
+
+            str_info = 'tabel berhasil dihapus :D'
+            # hapus tabel
+            db.execute("""
+            DROP TABLE IF EXISTS data_tabel_myadmin
+            """)
+
+            conn.commit()
+            # db.close()
+            # conn.close()
+
+            # untuk membersihkan semacam cache setelah proses hapus tabel
+            # conn = connect_db_to_vacuum()
+            # db = conn.cursor()
+
+            db.execute("""
+            vacuum
+            """)
+
+            conn.commit()
+            # db.close()
+            # conn.close()
+
+        # return str_info
+
+        if request.method == 'POST': # dioperasikan dihalaman sendiri tanpa send ke route lain, misal /myadmin
+
+            var1_in = request.form['nama_tabel']
+            var2_in = request.form['teks_sintaks']
+
+            # untuk mengkondisikan nama tabel tidak boleh ada spasi dan hanya a-z dan angka
+            # var1_in = var1_in.replace(" ","_").lower()
+            filter_var1_in = "_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+            getVals_base_filter_var1_in = list(filter(lambda x: x in filter_var1_in, var1_in))
+            var1_in = "".join(getVals_base_filter_var1_in).lower()
+
+            # Aksi => Buat, Hapus Tabel dari Tabel data_tabel_myadmin
+            aksi_sub = 'c'
+
+            if aksi_sub == 'c':
+                # conn = connect_db()
+                # db = conn.cursor()
+
+                str_info = 'tabel berhasil dibuat :D'
+                # create tabel
+                db.execute("""
+                CREATE TABLE IF NOT EXISTS """ + var1_in + """
+                (kolom2 TEXT, kolom3 DATETIME, kolom4 TEXT)
+                """)
+
+                conn.commit()
+                # db.close()
+                # conn.close()
+
+                """Mengisi data untuk spesifikasi tabel."""
+                # conn = connect_db()
+                # db = conn.cursor()
+
+                db.execute("SELECT * FROM data_tabel_myadmin WHERE nama_tabel = ?", (var1_in,))
+                entry = db.fetchone()
+
+                if entry is None:
+                    import numpy as np
+                    import pandas as pd
+
+                    from datetime import datetime
+                    import pytz
+                    Date = str(datetime.today().astimezone(pytz.timezone('Asia/Jakarta')).strftime('%d-%m-%Y %H:%M:%S'))
+
+                    db.execute("""INSERT INTO data_tabel_myadmin (nama_tabel, date_pembuatan, teks_sintaks) VALUES (?, ?, ?)""",
+                        (var1_in, Date, var2_in))
+
+                else:
+                    ket_hasil = 'Tidak dilakukan Insert, karena Tabel tidak kosong'
+
+                conn.commit()
+                # db.close()
+                # conn.close()
+
+            elif aksi_sub== 'd':
+                # conn = connect_db()
+                # db = conn.cursor()
+
+                str_info = 'tabel berhasil dihapus :D'
+                # hapus tabel
+                db.execute("""
+                DROP TABLE IF EXISTS """ + var1_in + """
+                """)
+
+                conn.commit()
+                # db.close()
+                # conn.close()
+
+                # untuk membersihkan semacam cache setelah proses hapus tabel
+                # conn = connect_db_to_vacuum()
+                # db = conn.cursor()
+
+                db.execute("""
+                vacuum
+                """)
+
+                conn.commit()
+                # db.close()
+                # conn.close()
+
+            # menampilkan data dari tabel data_tabel_myadmin
+            # conn = connect_db()
+            # db = conn.cursor()
+
+            c = db.execute(""" SELECT * FROM  data_tabel_myadmin """)
+
+            var_tabel_myadmin_in = c.fetchall()
+
+            conn.commit()
+            # db.close()
+            # conn.close()
+
+            db.close()
+            conn.close()
+
+            return render_template_string(A_a+template_view+Z_z, var1 = var1_in, var2 = var2_in, var_tabel_myadmin = var_tabel_myadmin_in)
+
+        else: # untuk yang 'GET' data awal untuk di send ke /myadmin
+
+            # menampilkan data dari tabel data_tabel_myadmin
+            # conn = connect_db()
+            # db = conn.cursor()
+
+            c = db.execute(""" SELECT * FROM  data_tabel_myadmin """)
+
+            var_tabel_myadmin_in = c.fetchall()
+
+            conn.commit()
+            # db.close()
+            # conn.close()
+
+            db.close()
+            conn.close()
+            return render_template_string(A_a+template_view+Z_z, var_tabel_myadmin = var_tabel_myadmin_in)
+            
+
 @app.route('/launchpad_menu')
 def launchpad_menu():
    return render_template("launchpad_menu.html")
