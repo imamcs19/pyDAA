@@ -1,3 +1,5 @@
+Contoh dengan Python:
+=======================
 %%file P1_contoh.py
 import sys
 import math
@@ -64,3 +66,63 @@ outfile.close()
 ----------------------------------------
 #cek kesamaan hasil
 !diff -w pyout.txt out.txt || break
+
+=======================
+Contoh dengan C/C++:
+=======================
+%%file contoh.cpp
+#include<bits/stdc++.h>
+#include <math.h>
+using namespace std;
+const int MAX_N = 1e8 + 5; // = 1000005
+int a[MAX_N];
+int main(){
+    int n;
+ 
+    scanf("%d", &n);    
+    for(int i = 1; i <= n; ++i){
+        scanf("%d", &a[i]);
+    }
+    
+ 
+    for(int i = 1; i <= n; ++i){
+        //printf("Case #%d: %d\n", i, a[i]);
+        int counter = 0;
+        if(a[i]==0 || a[i]==1){
+            counter+=1;
+        }
+        else{
+            set<int> used;
+            for(int j = 0; j <= (int)(sqrt(a[i]));++j){
+                //printf("%0.2f ", sqrt(a[i]-(j*j)));
+                //printf("%0.2f\n", floor(sqrt(a[i]-(j*j))));
+                //printf("\n");
+                if( sqrt(a[i]-(j*j)) == floor(sqrt(a[i]-(j*j)))){
+                    
+                    // "!used.count(j)" => maknanya nilai "j" tidak ada dalam variabel set "used"
+                    if( ( (a[i]-(j*j)) + (j*j) ) == a[i] && !used.count(j)){
+                        //printf("%d ", j);
+                        //printf("%d\n", (int)(sqrt(a[i]-(j*j))));
+                        
+                        counter+=1;
+                        used.insert(j);
+                        used.insert((int)(sqrt(a[i]-(j*j))));
+                    }
+                    
+                }           
+                //printf("Case #%d: %0.2f\n", a[i], floor(sqrt(a[i])));
+            }
+        }
+        printf("Case #%d: %d\n", i, counter);
+    }
+}
+
+-------------------------
+
+%%script bash
+g++ contoh.cpp -std=c++11 -o contoh
+
+------------------------------------
+
+!./contoh < in.txt > out.txt
+!cat out.txt
